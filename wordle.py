@@ -1,14 +1,5 @@
 import random
 import sys
-
-word_file = open('words.txt', 'r')
-raw_lines = word_file.readlines()
-lines = []
-# Strips the newline character
-for line in raw_lines:
-    if len(line) == 6:
-        line = line.strip().lower()
-        lines.append(line)
     
 def frequencies(lines):
     frequency = {}
@@ -26,32 +17,31 @@ def frequencies(lines):
         norm_frequency[k] = frequency[k] / count
     return norm_frequency
 
-def score_freq(word, frequency):
+def score_freq_sum(word, frequency):
     sum = 0
     seen = set()
     for c in word:
         if c not in seen:
-            #if sum < frequency[c]:
-            #    sum = frequency[c]
             sum = sum + frequency[c]
             seen.add(c)
         else:
-            #sum = 0
-            #break
             pass
     return sum
 
+def score_freq_max(word, frequency):
+    max = 0
+    seen = set()
+    for c in word:
+        if c not in seen:
+            if max < frequency[c]:
+                max = frequency[c]
+            seen.add(c)
+        else:
+            pass
+    return max
+
 def score_random(word, frequency):
     return random.random()
-
-def no_duplicates(word):
-    char_set = set()
-    for c in word:
-        if c in char_set:
-            return False
-        else:
-            char_set.add(c)
-    return True
 
 def parse_input(inp, word):
     result = {}
@@ -93,7 +83,7 @@ def filter_list(l, inp, word):
 
 def arrange_list(l):
     f = frequencies(l)
-    l.sort(key=lambda x: score_freq(x,f), reverse=True)
+    l.sort(key=lambda x: score_freq_sum(x,f), reverse=True)
 
 def eval_guess(word,inp):
     res = ''
@@ -108,6 +98,14 @@ def eval_guess(word,inp):
         count = count + 1
     return res
 
+word_file = open('words.txt', 'r')
+raw_lines = word_file.readlines()
+lines = []
+# Strips the newline character
+for line in raw_lines:
+    if len(line) == 6:
+        line = line.strip().lower()
+        lines.append(line)
     
 l = lines
 
@@ -125,6 +123,8 @@ if sys.argv[0] == 'test_wordle.py':
     sum = 0
     max = 0
     wcount = 0
+    ftable = {}
+    
     for word in lines:
         l = lines.copy()
         count = 0
@@ -135,27 +135,34 @@ if sys.argv[0] == 'test_wordle.py':
             res = eval_guess(word, guess)
             if res == "GGGGG":
                 break
-            #if count == 4:
-                #print("failed with: ",word)
-            #    break
             l = filter_list(l, res, guess)
         sum = sum + count
         if count > max:
             max = count
+        if count in ftable:
+            ftable[count] = ftable[count]+1
+        else:
+            ftable[count] = 1
         wcount = wcount + 1
-        #if wcount % 10 == 0:
-        #    print(wcount, sum, sum/wcount, max)
-        #if wcount == 2000:
-        #    break
-    print(wcount, sum, sum/wcount, max)
+    print("Words\tGuesses\tAvg\tMax")
+    print(wcount,"\t", sum, "\t", round(sum/wcount,2), "\t", max)
+    print("\n\nCount\tFrequency\n---")
+    sum_failed = 0
+    for k in sorted(ftable):
+        print(k,"\t",ftable[k])
+        if k > 6:
+            sum_failed = sum_failed + ftable[k]
+
+    print("\nPercent of words that will not be solved in 6 guesses: ",
+          round((sum_failed*100)/wcount,2))
             
 else:    
     while True:
         arrange_list(l)
         word = l[0]
-        print("Try: ", word)
+        print("Try: ", word, " (choosen out of: ",len(l),")")
         while True:
-            inp = input("result: ")
+            inp = input("Result: ")
             if inp == "naw":
                 l.remove(l[0])
                 word = l[0]

@@ -1,7 +1,7 @@
 import random
 import sys
 
-word_file = open('words_alpha.txt', 'r')
+word_file = open('words.txt', 'r')
 raw_lines = word_file.readlines()
 lines = []
 # Strips the newline character
@@ -26,16 +26,23 @@ def frequencies(lines):
         norm_frequency[k] = frequency[k] / count
     return norm_frequency
 
-def score(word, frequency):
+def score_freq(word, frequency):
     sum = 0
     seen = set()
     for c in word:
         if c not in seen:
+            #if sum < frequency[c]:
+            #    sum = frequency[c]
             sum = sum + frequency[c]
             seen.add(c)
         else:
-            sum = sum - frequency[c]
+            #sum = 0
+            #break
+            pass
     return sum
+
+def score_random(word, frequency):
+    return random.random()
 
 def no_duplicates(word):
     char_set = set()
@@ -86,28 +93,62 @@ def filter_list(l, inp, word):
 
 def arrange_list(l):
     f = frequencies(l)
-    l.sort(key=lambda x: score(x,f), reverse=True)
+    l.sort(key=lambda x: score_freq(x,f), reverse=True)
 
+def eval_guess(word,inp):
+    res = ''
+    count = 0
+    for i in inp:
+        if word[count] == i:
+            res = res + 'G'
+        elif i in word:
+            res = res + 'Y'
+        else:
+            res = res + 'R'
+        count = count + 1
+    return res
+
+    
 l = lines
 
 if sys.argv[0] == 'play_wordle.py':
     word = random.choice(l)
     while True:
         inp = input("Guess: ")
-        res = ''
-        count = 0
-        for i in inp:
-            if word[count] == i:
-                res = res + 'G'
-            elif i in word:
-                res = res + 'Y'
-            else:
-                res = res + 'R'
-            count = count + 1
+        res = eval_guess(word, inp)
         print(res)
         if res == 'GGGGG':
             print('yay')
             exit(0)
+
+if sys.argv[0] == 'test_wordle.py':
+    sum = 0
+    max = 0
+    wcount = 0
+    for word in lines:
+        l = lines.copy()
+        count = 0
+        while True:
+            arrange_list(l)
+            guess = l[0]
+            count = count + 1
+            res = eval_guess(word, guess)
+            if res == "GGGGG":
+                break
+            #if count == 4:
+                #print("failed with: ",word)
+            #    break
+            l = filter_list(l, res, guess)
+        sum = sum + count
+        if count > max:
+            max = count
+        wcount = wcount + 1
+        #if wcount % 10 == 0:
+        #    print(wcount, sum, sum/wcount, max)
+        #if wcount == 2000:
+        #    break
+    print(wcount, sum, sum/wcount, max)
+            
 else:    
     while True:
         arrange_list(l)

@@ -6,7 +6,7 @@ Usage:
 
 python wordle.py
 
-Then program will give you a suggestion to try in wordle. It will then ask for the result of the word. The format of that is:
+The program will give you a suggestion to try in wordle. It will then ask for the result of the word. The format of that is:
 
 XXXXX
 

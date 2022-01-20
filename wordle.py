@@ -61,22 +61,30 @@ def parse_input(inp, word):
 
     return result
 
+def _filter(x, in_, wrong, verboten):
+    for k in in_:
+        if x[k] != in_[k]:
+            return False
+
+    for k in wrong:
+        if x[k] == wrong[k] or wrong[k] not in x:
+            return False
+
+    for k in verboten:
+        if k in x:
+            return False
+
+    return True
+
 def filter_list(l, inp, word):
     result = parse_input(inp, word)
-    in_place = result['in']
-    for k in in_place:
-        l = list(filter(lambda x: x[k] == in_place[k], l))
-
-    wrong_place = result['wrong']
-    for k in wrong_place:
-        l = list(filter(lambda x: x[k] != wrong_place[k] and wrong_place[k] in x, l))
-
+    in_ = result['in']
+    wrong = result['wrong']
     verboten = result['verboten']
-    for k in verboten:
-        l = list(filter(lambda x: not k in x, l))
-    
-    return l
 
+    return [x for x in l if _filter(x, in_, wrong, verboten)]
+
+    
 def generate_guess(l):
     f = frequencies(l)
     max_score = 0
@@ -84,7 +92,7 @@ def generate_guess(l):
 
     for w in l:
         score = score_freq_sum(w,f)
-        if score > max_score:
+        if score >= max_score:
             max_score = score
             max_word = w
 

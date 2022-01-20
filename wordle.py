@@ -1,6 +1,6 @@
 import random
 import sys
-    
+
 def frequencies(lines):
     frequency = {}
     count = 0
@@ -17,15 +17,11 @@ def frequencies(lines):
         norm_frequency[k] = frequency[k] / count
     return norm_frequency
 
+l_dedup = {}
 def score_freq_sum(word, frequency):
     sum = 0
-    seen = set()
-    for c in word:
-        if c not in seen:
+    for c in l_dedup[word]:
             sum = sum + frequency[c]
-            seen.add(c)
-        else:
-            pass
     return sum
 
 def score_freq_max(word, frequency):
@@ -81,6 +77,19 @@ def filter_list(l, inp, word):
     
     return l
 
+def generate_guess(l):
+    f = frequencies(l)
+    max_score = 0
+    max_word = None
+
+    for w in l:
+        score = score_freq_sum(w,f)
+        if score > max_score:
+            max_score = score
+            max_word = w
+
+    return max_word
+
 def arrange_list(l):
     f = frequencies(l)
     l.sort(key=lambda x: score_freq_sum(x,f), reverse=True)
@@ -109,6 +118,12 @@ for line in raw_lines:
     
 l = lines
 
+for w in l:
+    chrs = set()
+    for c in w:
+        chrs.add(c)
+    l_dedup[w] = chrs
+
 if sys.argv[0] == 'play_wordle.py':
     word = random.choice(l)
     while True:
@@ -129,8 +144,7 @@ if sys.argv[0] == 'test_wordle.py':
         l = lines.copy()
         count = 0
         while True:
-            arrange_list(l)
-            guess = l[0]
+            guess = generate_guess(l)
             count = count + 1
             res = eval_guess(word, guess)
             if res == "GGGGG":
@@ -144,6 +158,7 @@ if sys.argv[0] == 'test_wordle.py':
         else:
             ftable[count] = 1
         wcount = wcount + 1
+
     print("Words\tGuesses\tAvg\tMax")
     print(wcount,"\t", sum, "\t", round(sum/wcount,2), "\t", max)
     print("\n\nCount\tFrequency\n---")
@@ -158,14 +173,13 @@ if sys.argv[0] == 'test_wordle.py':
             
 else:    
     while True:
-        arrange_list(l)
-        word = l[0]
+        word = generate_guess(l)
         print("Try: ", word, " (choosen out of: ",len(l),")")
         while True:
             inp = input("Result: ")
             if inp == "naw":
                 l.remove(l[0])
-                word = l[0]
+                word = generate_guess(l)
                 print("Try: ",word)
             else:
                 break

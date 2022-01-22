@@ -72,7 +72,7 @@ def filter_list(l, inp, word):
 
 def generate_guess(l):
     f = frequencies(l)
-    max_score = 0
+    max_score = -1
     max_word = None
 
     for w in l:
@@ -97,15 +97,26 @@ def eval_guess(word,inp):
     return res
 
 __lines = []
+__answers = []
 
-def init():
-    word_file = open('wordle-answers.txt', 'r')
+def load_word_list(fn, l):
+    word_file = open(fn, 'r')
     raw_lines = word_file.readlines()
 
     for line in raw_lines:
-        if len(line) == 6:
-            line = line.strip().lower()
-            __lines.append(line)
+        line = line.strip().lower()
+        if len(line) == 5:
+            l.append(line)
+
+    print('loaded ',len(l), 'words from ', fn)
+
+def init():
+    load_word_list('wordle-answers.txt', __answers)
+
+    for w in __answers:
+        __lines.append(w)
+
+    load_word_list('wordle-words.txt', __lines)
 
     for w in __lines:
         chrs = set()
@@ -114,7 +125,7 @@ def init():
         __l_dedup[w] = chrs
 
 def play():
-    l = __lines
+    l = __answers
     word = random.choice(l)
     while True:
         inp = input("Guess: ")
@@ -130,8 +141,8 @@ def test():
     wcount = 0
     ftable = {}
 
-    for word in __lines:
-        l = __lines.copy()
+    for word in __answers:
+        l = __answers.copy()
         count = 0
         while True:
             guess = generate_guess(l)
@@ -162,7 +173,7 @@ def test():
           round((sum_failed*100)/wcount,2))
 
 def cheat():
-    l = __lines
+    l = __answers
     while True:
         word = generate_guess(l)
         print("Try: ", word, " (chosen out of: ",len(l),")")

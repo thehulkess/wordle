@@ -69,7 +69,7 @@ def filter_list(l, inp, word):
 
     return [x for x in l if _filter(x, in_, wrong, verboten)]
 
-    
+
 def generate_guess(l):
     f = frequencies(l)
     max_score = 0
@@ -96,24 +96,25 @@ def eval_guess(word,inp):
         count = count + 1
     return res
 
-word_file = open('words.txt', 'r')
-raw_lines = word_file.readlines()
-lines = []
-# Strips the newline character
-for line in raw_lines:
-    if len(line) == 6:
-        line = line.strip().lower()
-        lines.append(line)
-    
-l = lines
+__lines = []
 
-for w in l:
-    chrs = set()
-    for c in w:
-        chrs.add(c)
-    __l_dedup[w] = chrs
+def init():
+    word_file = open('words.txt', 'r')
+    raw_lines = word_file.readlines()
 
-if sys.argv[0] == 'play_wordle.py':
+    for line in raw_lines:
+        if len(line) == 6:
+            line = line.strip().lower()
+            __lines.append(line)
+
+    for w in __lines:
+        chrs = set()
+        for c in w:
+            chrs.add(c)
+        __l_dedup[w] = chrs
+
+def play():
+    l = __lines
     word = random.choice(l)
     while True:
         inp = input("Guess: ")
@@ -123,14 +124,14 @@ if sys.argv[0] == 'play_wordle.py':
             print('yay')
             exit(0)
 
-if sys.argv[0] == 'test_wordle.py':
+def test():
     sum = 0
     max = 0
     wcount = 0
     ftable = {}
-    
-    for word in lines:
-        l = lines.copy()
+
+    for word in __lines:
+        l = __lines.copy()
         count = 0
         while True:
             guess = generate_guess(l)
@@ -159,8 +160,9 @@ if sys.argv[0] == 'test_wordle.py':
 
     print("\nPercent of words that will not be solved in 6 guesses: ",
           round((sum_failed*100)/wcount,2))
-            
-else:    
+
+def cheat():
+    l = __lines
     while True:
         word = generate_guess(l)
         print("Try: ", word, " (chosen out of: ",len(l),")")
@@ -172,3 +174,12 @@ else:
             l.remove(word)
         else:
             l = filter_list(l, inp, word)
+
+init()
+
+if sys.argv[0] == 'play_wordle.py':
+    play()
+elif sys.argv[0] == 'test_wordle.py':
+    test()
+else:
+    cheat()

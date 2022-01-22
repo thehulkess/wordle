@@ -99,7 +99,7 @@ def eval_guess(word,inp):
 __lines = []
 
 def init():
-    word_file = open('words.txt', 'r')
+    word_file = open('wordle-answers.txt', 'r')
     raw_lines = word_file.readlines()
 
     for line in raw_lines:

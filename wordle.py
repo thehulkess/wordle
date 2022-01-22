@@ -1,6 +1,10 @@
 import random
 import sys
 
+__words = []
+__answers = []
+__l_dedup = {}
+
 def frequencies(lines):
     frequency = {}
     count = 0
@@ -17,7 +21,6 @@ def frequencies(lines):
         norm_frequency[k] = frequency[k] / count
     return norm_frequency
 
-__l_dedup = {}
 def score_freq_sum(word, frequency):
     sum = 0
     for c in __l_dedup[word]:
@@ -69,7 +72,6 @@ def filter_list(l, inp, word):
 
     return [x for x in l if _filter(x, in_, wrong, verboten)]
 
-
 def generate_guess(l):
     f = frequencies(l)
     max_score = -1
@@ -83,8 +85,12 @@ def generate_guess(l):
 
     return max_word
 
-def eval_guess(word,inp):
+def eval_guess(word, inp):
     res = ''
+
+    if inp not in __words:
+        return 'naw'
+
     count = 0
     for i in inp:
         if word[count] == i:
@@ -96,9 +102,6 @@ def eval_guess(word,inp):
         count = count + 1
     return res
 
-__lines = []
-__answers = []
-
 def load_word_list(fn, l):
     word_file = open(fn, 'r')
     raw_lines = word_file.readlines()
@@ -108,17 +111,20 @@ def load_word_list(fn, l):
         if len(line) == 5:
             l.append(line)
 
-    print('loaded ',len(l), 'words from ', fn)
+def load_words():
+    for w in __answers:
+        __words.append(w)
 
-def init():
+    load_word_list('wordle-words.txt', __words)
+
+def load_answers():
     load_word_list('wordle-answers.txt', __answers)
 
-    for w in __answers:
-        __lines.append(w)
+def init():
+    load_answers()
+    load_words()
 
-    load_word_list('wordle-words.txt', __lines)
-
-    for w in __lines:
+    for w in __words:
         chrs = set()
         for c in w:
             chrs.add(c)

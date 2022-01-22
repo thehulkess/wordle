@@ -182,16 +182,12 @@ if sys.argv[0] == 'test_wordle.py':
 else:    
     while True:
         word = generate_guess(l)
-        print("Try: ", word, " (choosen out of: ",len(l),")")
-        while True:
-            inp = input("Result: ")
-            if inp == "naw":
-                l.remove(l[0])
-                word = generate_guess(l)
-                print("Try: ",word)
-            else:
-                break
+        print("Try: ", word, " (chosen out of: ",len(l),")")
+        inp = input("Result: ")
         if inp == "GGGGG":
             print("yay!")
             exit(0)
-        l = filter_list(l, inp, word)
+        if inp == "naw":
+            l.remove(word)
+        else:
+            l = filter_list(l, inp, word)

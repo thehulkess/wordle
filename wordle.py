@@ -17,27 +17,12 @@ def frequencies(lines):
         norm_frequency[k] = frequency[k] / count
     return norm_frequency
 
-l_dedup = {}
+__l_dedup = {}
 def score_freq_sum(word, frequency):
     sum = 0
-    for c in l_dedup[word]:
+    for c in __l_dedup[word]:
             sum = sum + frequency[c]
     return sum
-
-def score_freq_max(word, frequency):
-    max = 0
-    seen = set()
-    for c in word:
-        if c not in seen:
-            if max < frequency[c]:
-                max = frequency[c]
-            seen.add(c)
-        else:
-            pass
-    return max
-
-def score_random(word, frequency):
-    return random.random()
 
 def parse_input(inp, word):
     result = {}
@@ -98,10 +83,6 @@ def generate_guess(l):
 
     return max_word
 
-def arrange_list(l):
-    f = frequencies(l)
-    l.sort(key=lambda x: score_freq_sum(x,f), reverse=True)
-
 def eval_guess(word,inp):
     res = ''
     count = 0
@@ -130,7 +111,7 @@ for w in l:
     chrs = set()
     for c in w:
         chrs.add(c)
-    l_dedup[w] = chrs
+    __l_dedup[w] = chrs
 
 if sys.argv[0] == 'play_wordle.py':
     word = random.choice(l)

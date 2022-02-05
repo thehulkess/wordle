@@ -4,7 +4,7 @@ Yes, another one. In python. This one is trying to rank guesses by using words w
 
 Usage:
 
-python wordle.py
+python3 wordle.py
 
 The program will give you a suggestion to try in wordle. It will then ask for the result of the word. The format of that is:
 

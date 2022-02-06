@@ -183,7 +183,7 @@ def cheat():
     while True:
         word = generate_guess(l)
         print("Try: ", word, " (chosen out of: ",len(l),")")
-        inp = input("Result: ")
+        inp = input("Result: ").upper()
         if inp == "GGGGG":
             print("yay!")
             exit(0)

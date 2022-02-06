@@ -194,6 +194,13 @@ def cheat():
 
 init()
 
+try:
+    assert (sys.version_info[0] == 3), "Run with python version 3. Usage: python3 wordle.py"
+
+except Exception as e:
+    print (e)
+    sys.exit(1)
+
 if sys.argv[0] == 'play_wordle.py':
     play()
 elif sys.argv[0] == 'test_wordle.py':
